@@ -1,66 +1,77 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 # -----------------------------
-# 앱 제목
+# 앱 기본 설정
 # -----------------------------
-st.set_page_config(page_title="광고 효과 분석 시뮬레이터", page_icon="📢", layout="wide")
-st.title("📢 광고 효과 분석 시뮬레이터")
-st.write("광고 캠페인의 **예산, 채널, 타겟**을 설정하고 예상 광고 효과를 시뮬레이션해보세요! 🚀")
+st.set_page_config(page_title="AI 광고 효과 분석 시뮬레이터", page_icon="🤖", layout="wide")
+st.title("🤖 AI 광고 효과 분석 시뮬레이터")
+st.write("광고를 업로드하면 **예상 타겟, 효과 분석, 감정 반응**을 AI가 시뮬레이션합니다! 🚀")
 
 # -----------------------------
-# 사이드바 입력
+# 광고 업로드
 # -----------------------------
-st.sidebar.header("🎯 캠페인 설정")
-budget = st.sidebar.slider("예산 (만원)", 100, 1000, 500)
-channel = st.sidebar.selectbox("광고 채널", ["유튜브", "인스타그램", "TV", "옥외광고"])
-duration = st.sidebar.slider("기간 (주)", 1, 12, 4)
-target_age = st.sidebar.selectbox("타겟 연령대", ["10대", "20대", "30대", "40대 이상"])
+st.sidebar.header("📂 광고 업로드")
+ad_text = st.sidebar.text_area("광고 문구 입력", "여기에 광고 문구를 작성하세요 ✍️")
+ad_image = st.sidebar.file_uploader("광고 이미지 업로드 (선택)", type=["jpg", "png", "jpeg"])
 
 # -----------------------------
-# 채널별 가중치 (임의 값)
+# AI 타겟 예측 (간단 시뮬레이션)
 # -----------------------------
-channel_weights = {
-    "유튜브": 1.2,
-    "인스타그램": 1.0,
-    "TV": 0.8,
-    "옥외광고": 0.6
-}
+def predict_target(text):
+    ages = ["10대", "20대", "30대", "40대 이상"]
+    genders = ["남성", "여성", "모두"]
+    interests = ["패션", "게임", "뷰티", "여행", "테크", "음식"]
+
+    return {
+        "연령대": random.choice(ages),
+        "성별": random.choice(genders),
+        "관심사": random.sample(interests, 2)
+    }
 
 # -----------------------------
-# 광고 효과 가상의 계산
+# 광고 효과 분석 (랜덤 기반)
 # -----------------------------
-reach = budget * channel_weights[channel] * np.random.uniform(50, 80)
-clicks = reach * np.random.uniform(0.01, 0.05)
-conversions = clicks * np.random.uniform(0.05, 0.2)
-roi = (conversions * 2000) / (budget * 10000)  # 가정: 1건당 2000원 수익
+def analyze_effect():
+    reach = random.randint(1000, 10000)
+    ctr = round(random.uniform(0.5, 5.0), 2)  # 클릭률 %
+    conversion = round(random.uniform(0.5, 3.0), 2)  # 전환율 %
+    roi = round(random.uniform(0.5, 3.0), 2)  # ROI 배율
+    return reach, ctr, conversion, roi
 
 # -----------------------------
-# 결과 출력 (카드 형식)
+# 감정 반응 분석 (긍/부정 비율)
 # -----------------------------
-st.subheader("📊 예상 광고 효과")
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Reach", f"{int(reach):,}")
-col2.metric("Clicks", f"{int(clicks):,}")
-col3.metric("Conversions", f"{int(conversions):,}")
-col4.metric("ROI", f"{roi:.2f}")
+def sentiment_analysis():
+    positive = random.randint(50, 90)
+    negative = 100 - positive
+    return positive, negative
 
 # -----------------------------
-# 그래프 (기간별 전환 수)
+# 버튼 클릭 시 분석 실행
 # -----------------------------
-st.subheader("📈 기간별 성과 시뮬레이션")
-weeks = np.arange(1, duration+1)
-performance = np.cumsum(np.random.randint(100, 500, size=duration))
+if st.sidebar.button("🔍 광고 분석 시작"):
+    st.subheader("🎯 예상 타겟 분석")
+    target = predict_target(ad_text)
+    st.write(f"- 연령대: {target['연령대']}")
+    st.write(f"- 성별: {target['성별']}")
+    st.write(f"- 관심사: {', '.join(target['관심사'])}")
 
-fig, ax = plt.subplots()
-ax.plot(weeks, performance, marker="o", color="purple", linewidth=2)
-ax.set_title("기간별 전환 수 증가")
-ax.set_xlabel("주차")
-ax.set_ylabel("전환 수")
-st.pyplot(fig)
+    st.subheader("📊 광고 효과 분석")
+    reach, ctr, conversion, roi = analyze_effect()
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("도달률 (Reach)", f"{reach:,}")
+    col2.metric("클릭률 (CTR)", f"{ctr}%")
+    col3.metric("전환율 (Conversion)", f"{conversion}%")
+    col4.metric("ROI", f"{roi}x")
 
-# -----------------------------
-# 완료 메시지
-# -----------------------------
-st.success("✨ 캠페인 시뮬레이션 완료! 프레젠테이션에서 활용해보세요 😎")
+    st.subheader("😊 감정 반응 분석")
+    positive, negative = sentiment_analysis()
+    fig, ax = plt.subplots()
+    ax.pie([positive, negative], labels=["긍정 👍", "부정 👎"], autopct="%1.1f%%", colors=["#6c5ce7", "#d63031"])
+    ax.set_title("광고 감정 반응")
+    st.pyplot(fig)
+
+    st.success("✅ 광고 분석이 완료되었습니다!")
