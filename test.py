@@ -1,11 +1,11 @@
 import streamlit as st
 import random
 
-st.set_page_config(page_title="📺💡 미디어 리터러시 퀴즈 💡📺", layout="centered")
+st.set_page_config(page_title="📺💡미디어 리터러시 퀴즈💡📺", layout="centered")
 
-st.title("📺💡 미디어 리터러시 & 가짜 광고 퀴즈 💡📺")
-st.write("문제를 신중히 읽고 제출하세요! 😎✨")
-st.write("💡 힌트: 광고의 출처, 근거, 과장 여부를 논리적으로 판단하세요! 💡")
+st.title("📺💡미디어 리터러시 & 가짜 광고 퀴즈💡📺")
+st.write("문제를 신중히 읽고 제출하세요!😎✨")
+st.write("💡 힌트: 광고의 출처, 근거, 과장 여부를 논리적으로 판단하세요!💡")
 
 # ===============================
 # 문제 데이터 (난이도 살짝 높임)
