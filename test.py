@@ -72,28 +72,47 @@ questions = [
 # ===============================
 if "current_question" not in st.session_state:
     st.session_state.current_question = 0
+if "answered" not in st.session_state:
+    st.session_state.answered = False
+if "score" not in st.session_state:
+    st.session_state.score = 0
 
+# ===============================
+# 현재 문제
+# ===============================
 current_question = st.session_state.current_question
 
-# ===============================
-# 문제 표시
-# ===============================
 if current_question < len(questions):
     q = questions[current_question]
     st.header(f"문제 {current_question + 1}️⃣")
     st.write(q["question"])
+    
     selected_option = st.radio("선택하세요:", q["options"], key=f"q{current_question}")
 
-    if st.button("제출 ✔️", key=f"submit_{current_question}"):
+    if st.button("제출 ✔️", key=f"submit_{current_question}") and not st.session_state.answered:
+        st.session_state.answered = True
+
         if selected_option == q["answer"]:
             st.success("🎉 정답입니다! 축하합니다! 🎉")
             st.balloons()
+            st.session_state.score += 1
         else:
             st.error("💀 오답입니다! 바이러스 감지! 💀")
         st.info(f"💡 해설: {q['explanation']}")
 
-        # 다음 문제로 이동
-        st.session_state.current_question += 1
-        st.experimental_rerun()
+    if st.session_state.answered:
+        if st.button("다음 문제 ➡️"):
+            st.session_state.current_question += 1
+            st.session_state.answered = False
+            st.experimental_rerun()
 else:
     st.success("🎉 모든 문제 완료! 퀴즈를 마쳤습니다! 📚✨")
+    st.info(f"🎯 총 점수: {st.session_state.score} / {len(questions)}")
+    # 맞춘 개수에 따라 confetti 애니메이션
+    if st.session_state.score == len(questions):
+        st.balloons()
+        st.success("🏆 만점! 정말 최고예요! 🎉✨")
+    elif st.session_state.score >= len(questions)//2:
+        st.success("👍 절반 이상 맞췄어요! 잘했어요! 🎉")
+    else:
+        st.warning("😅 조금 아쉬워요. 다시 도전해보세요!")
