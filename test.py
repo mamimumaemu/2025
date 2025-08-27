@@ -68,17 +68,23 @@ questions = [
 ]
 
 # ===============================
-# 문제 선택
+# 세션 상태 초기화
 # ===============================
-current_question = st.session_state.get("current_question", 0)
+if "current_question" not in st.session_state:
+    st.session_state.current_question = 0
 
+current_question = st.session_state.current_question
+
+# ===============================
+# 문제 표시
+# ===============================
 if current_question < len(questions):
     q = questions[current_question]
     st.header(f"문제 {current_question + 1}️⃣")
     st.write(q["question"])
     selected_option = st.radio("선택하세요:", q["options"], key=f"q{current_question}")
 
-    if st.button("제출 ✔️"):
+    if st.button("제출 ✔️", key=f"submit_{current_question}"):
         if selected_option == q["answer"]:
             st.success("🎉 정답입니다! 축하합니다! 🎉")
             st.balloons()
@@ -87,8 +93,6 @@ if current_question < len(questions):
         st.info(f"💡 해설: {q['explanation']}")
 
         # 다음 문제로 이동
-        if "current_question" not in st.session_state:
-            st.session_state.current_question = 0
         st.session_state.current_question += 1
         st.experimental_rerun()
 else:
